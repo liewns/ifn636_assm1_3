@@ -7,6 +7,7 @@ import Navbar from './components/Navbar';
 import Landing from './pages/Landing';
 import Dashboard from './pages/Dashboard';
 import Settings from './pages/Settings';
+import TripDetails from './pages/TripDetails';
 
 function AppRoutes() {
   const location = useLocation();
@@ -21,6 +22,7 @@ function AppRoutes() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/trips" element={<Trips />} />
+        <Route path="/trips/:id" element={<TripDetails />} />
         <Route path="/expenses" element={<Expenses />} />
         <Route path="/settings" element={<Settings />} />
       </Routes>

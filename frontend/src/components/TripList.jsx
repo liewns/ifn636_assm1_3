@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import axiosInstance from '../axiosConfig';
 
@@ -5,6 +6,12 @@ const TripList = ({ trips, expenses, setTrips, setEditingTrip }) => {
   const { user } = useAuth();
 
   const handleDelete = async (tripId) => {
+    const confirmed = window.confirm(
+      'Are you sure you want to delete this trip?'
+    );
+
+    if (!confirmed) return;
+
     try {
       await axiosInstance.delete(`/api/trips/${tripId}`, {
         headers: { Authorization: `Bearer ${user.token}` },
@@ -115,10 +122,10 @@ const TripList = ({ trips, expenses, setTrips, setEditingTrip }) => {
                 </div>
               </div>
 
-              <div className="mt-3">
+              <div className="mt-4 flex flex-wrap gap-2">
                 <button
                   onClick={() => setEditingTrip(trip)}
-                  className="mr-2 bg-yellow-500 text-white px-4 py-2 rounded"
+                  className="bg-yellow-500 text-white px-4 py-2 rounded"
                 >
                   Edit
                 </button>
@@ -129,6 +136,13 @@ const TripList = ({ trips, expenses, setTrips, setEditingTrip }) => {
                 >
                   Delete
                 </button>
+
+                <Link
+                  to={`/trips/${trip._id}`}
+                  className="bg-blue-600 text-white px-4 py-2 rounded"
+                >
+                  View Details
+                </Link>
               </div>
             </div>
           );
