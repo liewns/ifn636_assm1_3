@@ -3,10 +3,22 @@ import { Link } from 'react-router-dom';
 const Landing = () => {
   return (
     <div className="min-h-screen bg-slate-50">
+      {/* Public navbar for unauthenticated users */}
+      <nav className="bg-blue-600 text-white px-6 py-4 flex justify-between items-center">
+        <div className="text-xl font-bold">Travel Expense Tracker</div>
+
+        <div className="space-x-4">
+          <Link to="/login" className="hover:underline">
+            Login
+          </Link>
+          <Link to="/register" className="hover:underline">
+            Register
+          </Link>
+        </div>
+      </nav>
 
       {/* Main landing page content for first-time and unauthenticated users */}
       <main className="px-8 py-16">
-
         {/* Hero section introducing the system and primary actions */}
         <section className="max-w-6xl mx-auto grid md:grid-cols-2 gap-10 items-center">
           <div>
@@ -18,7 +30,7 @@ const Landing = () => {
               costs organised in one convenient system.
             </p>
 
-            {/* Call-to-action buttons for registration and login */} 
+            {/* Call-to-action buttons for registration and login */}
             <div className="flex flex-wrap gap-4">
               <Link
                 to="/register"

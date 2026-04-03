@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Trips from './pages/Trip';
@@ -8,10 +8,13 @@ import Landing from './pages/Landing';
 import Dashboard from './pages/Dashboard';
 import Settings from './pages/Settings';
 
-function App() {
+function AppRoutes() {
+  const location = useLocation();
+
   return (
-    <Router>
-      <Navbar />
+    <>
+      {location.pathname !== '/' && <Navbar />}
+
       <Routes>
         <Route path="/" element={<Landing />} />
         <Route path="/dashboard" element={<Dashboard />} />
@@ -21,6 +24,14 @@ function App() {
         <Route path="/expenses" element={<Expenses />} />
         <Route path="/settings" element={<Settings />} />
       </Routes>
+    </>
+  );
+}
+
+function App() {
+  return (
+    <Router>
+      <AppRoutes />
     </Router>
   );
 }
