@@ -13,6 +13,7 @@ app.use(express.json());
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/trips', require('./routes/tripRoutes'));
 app.use('/api/expenses', require('./routes/expenseRoutes'));
+app.use('/api/admin', require('./routes/adminRoutes'));
 
 if (require.main === module) {
   connectDB();

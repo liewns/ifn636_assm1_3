@@ -29,6 +29,11 @@ const Navbar = () => {
             <Link to="/settings" className="hover:underline">
               Settings
             </Link>
+            {user.role === 'admin' && (
+              <Link to="/admin" className="hover:underline">
+                Admin
+              </Link>
+            )}
             <button
               onClick={handleLogout}
               className="bg-white text-blue-600 px-3 py-1 rounded"
@@ -36,16 +41,7 @@ const Navbar = () => {
               Logout
             </button>
           </>
-        ) : (
-          <>
-            <Link to="/login" className="hover:underline">
-              Login
-            </Link>
-            <Link to="/register" className="hover:underline">
-              Register
-            </Link>
-          </>
-        )}
+        ) : null}
       </div>
     </nav>
   );

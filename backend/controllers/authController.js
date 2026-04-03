@@ -31,6 +31,7 @@ const registerUser = async (req, res) => {
       id: user.id,
       name: user.name,
       email: user.email,
+      role: user.role,
       token: generateToken(user.id),
     });
   } catch (error) {
@@ -59,6 +60,7 @@ const loginUser = async (req, res) => {
       id: user.id,
       name: user.name,
       email: user.email,
+      role: user.role,
       token: generateToken(user.id),
     });
   } catch (error) {
@@ -79,6 +81,7 @@ const getProfile = async (req, res) => {
       id: user.id,
       name: user.name,
       email: user.email,
+      role: user.role,
     });
   } catch (error) {
     return res.status(500).json({ message: 'Server error', error: error.message });
@@ -111,6 +114,7 @@ const updateUserProfile = async (req, res) => {
       id: updatedUser.id,
       name: updatedUser.name,
       email: updatedUser.email,
+      role: updatedUser.role,
       token: generateToken(updatedUser.id),
     });
   } catch (error) {

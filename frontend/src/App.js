@@ -9,6 +9,7 @@ import Landing from './pages/Landing';
 import Dashboard from './pages/Dashboard';
 import Settings from './pages/Settings';
 import TripDetails from './pages/TripDetails';
+import Admin from './pages/Admin';
 
 function AppRoutes() {
   const location = useLocation();
@@ -29,6 +30,7 @@ function AppRoutes() {
         <Route path="/trips/:id" element={<TripDetails />} />
         <Route path="/expenses" element={<Expenses />} />
         <Route path="/settings" element={<Settings />} />
+        <Route path="/admin" element={<Admin />} />
       </Routes>
     </>
   );
