@@ -5,19 +5,20 @@ import axiosInstance from '../axiosConfig';
 const TripList = ({ trips, expenses, setTrips, setEditingTrip }) => {
   const { user } = useAuth();
 
-  const handleDelete = async (tripId) => {
+  const handleDelete = async (trip) => {
     const confirmed = window.confirm(
-      'Are you sure you want to delete this trip?'
+      `Are you sure you want to delete "${trip.tripName}"?\n\nThis action cannot be undone.`
     );
 
     if (!confirmed) return;
 
     try {
-      await axiosInstance.delete(`/api/trips/${tripId}`, {
+      await axiosInstance.delete(`/api/trips/${trip._id}`, {
         headers: { Authorization: `Bearer ${user.token}` },
       });
 
-      setTrips(trips.filter((trip) => trip._id !== tripId));
+      setTrips(trips.filter((item) => item._id !== trip._id));
+      alert('Trip deleted successfully.');
     } catch (error) {
       console.error('Delete trip error:', error);
       alert(error.response?.data?.message || 'Failed to delete trip.');
@@ -45,8 +46,16 @@ const TripList = ({ trips, expenses, setTrips, setEditingTrip }) => {
       <h2 className="text-2xl font-bold mb-4">My Trips</h2>
 
       {trips.length === 0 ? (
-        <div className="bg-gray-100 p-4 rounded shadow">
-          No trips yet. Create your first trip above.
+        <div className="bg-white border border-slate-200 rounded-2xl shadow p-6 text-center">
+          <h3 className="text-xl font-semibold text-slate-900 mb-2">
+            No trips yet
+          </h3>
+          <p className="text-slate-600 mb-3">
+            Create your first trip above to start planning your budget and tracking expenses.
+          </p>
+          <p className="text-sm text-slate-500">
+            Add a trip name, budget, dates, and notes to get started.
+          </p>
         </div>
       ) : (
         trips.map((trip) => {
@@ -131,7 +140,7 @@ const TripList = ({ trips, expenses, setTrips, setEditingTrip }) => {
                 </button>
 
                 <button
-                  onClick={() => handleDelete(trip._id)}
+                  onClick={() => handleDelete(trip)}
                   className="bg-red-500 text-white px-4 py-2 rounded"
                 >
                   Delete

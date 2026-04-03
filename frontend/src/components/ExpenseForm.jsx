@@ -49,6 +49,18 @@ const ExpenseForm = ({
     });
   };
 
+  const handleCancelEdit = () => {
+    setEditingExpense(null);
+    setFormData({
+      title: '',
+      amount: '',
+      category: '',
+      date: '',
+      trip: trips.length > 0 ? trips[0]._id : '',
+      notes: '',
+    });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -82,12 +94,15 @@ const ExpenseForm = ({
             expense._id === response.data._id ? response.data : expense
           )
         );
+
+        alert('Expense updated successfully.');
       } else {
         const response = await axiosInstance.post('/api/expenses', payload, {
           headers: { Authorization: `Bearer ${user.token}` },
         });
 
         setExpenses([response.data, ...expenses]);
+        alert('Expense created successfully.');
       }
 
       setEditingExpense(null);
@@ -107,9 +122,15 @@ const ExpenseForm = ({
 
   return (
     <form onSubmit={handleSubmit} className="bg-white p-6 shadow-md rounded mb-6">
-      <h1 className="text-2xl font-bold mb-4">
+      <h1 className="text-2xl font-bold mb-2">
         {editingExpense ? 'Edit Expense' : 'Create New Expense'}
       </h1>
+
+      <p className="text-slate-600 mb-4">
+        {editingExpense
+          ? 'Update the selected expense or cancel to go back to your filtered list.'
+          : 'Add an expense and link it to one of your trips to track spending accurately.'}
+      </p>
 
       <input
         type="text"
@@ -183,9 +204,24 @@ const ExpenseForm = ({
         rows="4"
       />
 
-      <button type="submit" className="w-full bg-blue-600 text-white p-2 rounded">
-        {editingExpense ? 'Update Expense' : 'Create Expense'}
-      </button>
+      <div className="flex gap-3">
+        <button
+          type="submit"
+          className="flex-1 bg-blue-600 text-white p-2 rounded hover:bg-blue-700"
+        >
+          {editingExpense ? 'Update Expense' : 'Create Expense'}
+        </button>
+
+        {editingExpense && (
+          <button
+            type="button"
+            onClick={handleCancelEdit}
+            className="flex-1 bg-slate-200 text-slate-900 p-2 rounded hover:bg-slate-300"
+          >
+            Cancel Edit
+          </button>
+        )}
+      </div>
     </form>
   );
 };

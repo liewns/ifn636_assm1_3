@@ -170,9 +170,17 @@ const TripDetails = () => {
           </div>
 
           {expenses.length === 0 ? (
-            <p className="text-slate-500">
-              No expenses linked to this trip yet.
-            </p>
+            <div className="border border-slate-200 rounded-2xl p-6 text-center">
+              <h3 className="text-xl font-semibold text-slate-900 mb-2">
+                No expenses linked to this trip yet
+              </h3>
+              <p className="text-slate-600 mb-3">
+                Go to the Expenses page and add an expense for this trip to start tracking spending.
+              </p>
+              <p className="text-sm text-slate-500">
+                Choose this trip from the dropdown when creating the expense.
+              </p>
+            </div>
           ) : (
             <div className="space-y-4">
               {expenses.map((expense) => (

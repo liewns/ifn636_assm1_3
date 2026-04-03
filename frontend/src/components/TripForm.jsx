@@ -40,6 +40,17 @@ const TripForm = ({ trips, setTrips, editingTrip, setEditingTrip }) => {
     });
   };
 
+  const handleCancelEdit = () => {
+    setEditingTrip(null);
+    setFormData({
+      tripName: '',
+      budget: '',
+      startDate: '',
+      endDate: '',
+      notes: '',
+    });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -78,12 +89,15 @@ const TripForm = ({ trips, setTrips, editingTrip, setEditingTrip }) => {
             trip._id === response.data._id ? response.data : trip
           )
         );
+
+        alert('Trip updated successfully.');
       } else {
         const response = await axiosInstance.post('/api/trips', payload, {
           headers: { Authorization: `Bearer ${user.token}` },
         });
 
         setTrips([response.data, ...trips]);
+        alert('Trip created successfully.');
       }
 
       setEditingTrip(null);
@@ -102,9 +116,15 @@ const TripForm = ({ trips, setTrips, editingTrip, setEditingTrip }) => {
 
   return (
     <form onSubmit={handleSubmit} className="bg-white p-6 shadow-md rounded mb-6">
-      <h1 className="text-2xl font-bold mb-4">
+      <h1 className="text-2xl font-bold mb-2">
         {editingTrip ? 'Edit Trip' : 'Create New Trip'}
       </h1>
+
+      <p className="text-slate-600 mb-4">
+        {editingTrip
+          ? 'Update your trip details below or cancel to return to the trip list.'
+          : 'Add a new trip with a budget, dates, and notes to start tracking your travel spending.'}
+      </p>
 
       <input
         type="text"
@@ -157,9 +177,24 @@ const TripForm = ({ trips, setTrips, editingTrip, setEditingTrip }) => {
         rows="4"
       />
 
-      <button type="submit" className="w-full bg-blue-600 text-white p-2 rounded">
-        {editingTrip ? 'Update Trip' : 'Create Trip'}
-      </button>
+      <div className="flex gap-3">
+        <button
+          type="submit"
+          className="flex-1 bg-blue-600 text-white p-2 rounded hover:bg-blue-700"
+        >
+          {editingTrip ? 'Update Trip' : 'Create Trip'}
+        </button>
+
+        {editingTrip && (
+          <button
+            type="button"
+            onClick={handleCancelEdit}
+            className="flex-1 bg-slate-200 text-slate-900 p-2 rounded hover:bg-slate-300"
+          >
+            Cancel Edit
+          </button>
+        )}
+      </div>
     </form>
   );
 };
