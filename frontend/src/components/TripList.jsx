@@ -29,12 +29,23 @@ const TripList = ({ trips, setTrips, setEditingTrip }) => {
         trips.map((trip) => (
           <div key={trip._id} className="bg-gray-100 p-4 mb-4 rounded shadow">
             <h3 className="font-bold text-lg">{trip.tripName}</h3>
-            <p>{trip.destination}</p>
-            <p className="text-sm text-gray-500">
-              Travel Date:{' '}
-              {trip.travelDate
-                ? new Date(trip.travelDate).toLocaleDateString()
-                : 'No date'}
+            <p>
+              <span className="font-medium">Budget:</span> ${Number(trip.budget).toFixed(2)}
+            </p>
+            <p>
+              <span className="font-medium">Start Date:</span>{' '}
+              {trip.startDate
+                ? new Date(trip.startDate).toLocaleDateString()
+                : 'No start date'}
+            </p>
+            <p>
+              <span className="font-medium">End Date:</span>{' '}
+              {trip.endDate
+                ? new Date(trip.endDate).toLocaleDateString()
+                : 'No end date'}
+            </p>
+            <p>
+              <span className="font-medium">Notes:</span> {trip.notes || 'No notes'}
             </p>
 
             <div className="mt-3">

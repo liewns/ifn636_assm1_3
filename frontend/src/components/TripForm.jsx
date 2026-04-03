@@ -4,26 +4,31 @@ import axiosInstance from '../axiosConfig';
 
 const TripForm = ({ trips, setTrips, editingTrip, setEditingTrip }) => {
   const { user } = useAuth();
+
   const [formData, setFormData] = useState({
     tripName: '',
-    destination: '',
-    travelDate: '',
+    budget: '',
+    startDate: '',
+    endDate: '',
+    notes: '',
   });
 
   useEffect(() => {
     if (editingTrip) {
       setFormData({
         tripName: editingTrip.tripName || '',
-        destination: editingTrip.destination || '',
-        travelDate: editingTrip.travelDate
-          ? editingTrip.travelDate.slice(0, 10)
-          : '',
+        budget: editingTrip.budget ?? '',
+        startDate: editingTrip.startDate ? editingTrip.startDate.slice(0, 10) : '',
+        endDate: editingTrip.endDate ? editingTrip.endDate.slice(0, 10) : '',
+        notes: editingTrip.notes || '',
       });
     } else {
       setFormData({
         tripName: '',
-        destination: '',
-        travelDate: '',
+        budget: '',
+        startDate: '',
+        endDate: '',
+        notes: '',
       });
     }
   }, [editingTrip]);
@@ -38,16 +43,31 @@ const TripForm = ({ trips, setTrips, editingTrip, setEditingTrip }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!formData.tripName || !formData.destination || !formData.travelDate) {
-      alert('Please fill in all fields.');
+    if (!formData.tripName || !formData.budget || !formData.startDate || !formData.endDate) {
+      alert('Please fill in all required fields.');
+      return;
+    }
+
+    if (Number(formData.budget) < 0) {
+      alert('Budget cannot be negative.');
+      return;
+    }
+
+    if (new Date(formData.endDate) < new Date(formData.startDate)) {
+      alert('End date cannot be before start date.');
       return;
     }
 
     try {
+      const payload = {
+        ...formData,
+        budget: Number(formData.budget),
+      };
+
       if (editingTrip) {
         const response = await axiosInstance.put(
           `/api/trips/${editingTrip._id}`,
-          formData,
+          payload,
           {
             headers: { Authorization: `Bearer ${user.token}` },
           }
@@ -59,7 +79,7 @@ const TripForm = ({ trips, setTrips, editingTrip, setEditingTrip }) => {
           )
         );
       } else {
-        const response = await axiosInstance.post('/api/trips', formData, {
+        const response = await axiosInstance.post('/api/trips', payload, {
           headers: { Authorization: `Bearer ${user.token}` },
         });
 
@@ -69,8 +89,10 @@ const TripForm = ({ trips, setTrips, editingTrip, setEditingTrip }) => {
       setEditingTrip(null);
       setFormData({
         tripName: '',
-        destination: '',
-        travelDate: '',
+        budget: '',
+        startDate: '',
+        endDate: '',
+        notes: '',
       });
     } catch (error) {
       console.error('Save trip error:', error);
@@ -95,22 +117,44 @@ const TripForm = ({ trips, setTrips, editingTrip, setEditingTrip }) => {
       />
 
       <input
-        type="text"
-        name="destination"
-        placeholder="Destination"
-        value={formData.destination}
+        type="number"
+        name="budget"
+        placeholder="Budget"
+        value={formData.budget}
+        onChange={handleChange}
+        className="w-full mb-4 p-2 border rounded"
+        min="0"
+        step="0.01"
+        required
+      />
+
+      <label className="block mb-1 font-medium">Start Date</label>
+      <input
+        type="date"
+        name="startDate"
+        value={formData.startDate}
         onChange={handleChange}
         className="w-full mb-4 p-2 border rounded"
         required
       />
 
+      <label className="block mb-1 font-medium">End Date</label>
       <input
         type="date"
-        name="travelDate"
-        value={formData.travelDate}
+        name="endDate"
+        value={formData.endDate}
         onChange={handleChange}
         className="w-full mb-4 p-2 border rounded"
         required
+      />
+
+      <textarea
+        name="notes"
+        placeholder="Notes"
+        value={formData.notes}
+        onChange={handleChange}
+        className="w-full mb-4 p-2 border rounded"
+        rows="4"
       />
 
       <button type="submit" className="w-full bg-blue-600 text-white p-2 rounded">

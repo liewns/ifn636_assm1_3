@@ -11,18 +11,28 @@ const getTrips = async (req, res) => {
 };
 
 const createTrip = async (req, res) => {
-  const { tripName, destination, travelDate } = req.body;
+  const { tripName, budget, startDate, endDate, notes } = req.body;
 
   try {
-    if (!tripName || !destination || !travelDate) {
-      return res.status(400).json({ message: 'Please fill in all fields' });
+    if (!tripName || budget === undefined || !startDate || !endDate) {
+      return res.status(400).json({ message: 'Please fill in all required fields' });
+    }
+
+    if (Number(budget) < 0) {
+      return res.status(400).json({ message: 'Budget cannot be negative' });
+    }
+
+    if (new Date(endDate) < new Date(startDate)) {
+      return res.status(400).json({ message: 'End date cannot be before start date' });
     }
 
     const trip = await Trip.create({
       user: req.user.id,
       tripName,
-      destination,
-      travelDate,
+      budget,
+      startDate,
+      endDate,
+      notes: notes || '',
     });
 
     res.status(201).json(trip);
@@ -33,7 +43,7 @@ const createTrip = async (req, res) => {
 };
 
 const updateTrip = async (req, res) => {
-  const { tripName, destination, travelDate } = req.body;
+  const { tripName, budget, startDate, endDate, notes } = req.body;
 
   try {
     const trip = await Trip.findById(req.params.id);
@@ -46,12 +56,28 @@ const updateTrip = async (req, res) => {
       return res.status(401).json({ message: 'Not authorised' });
     }
 
-    trip.tripName = tripName || trip.tripName;
-    trip.destination = destination || trip.destination;
-    trip.travelDate = travelDate || trip.travelDate;
+    const updatedTripName = tripName ?? trip.tripName;
+    const updatedBudget = budget ?? trip.budget;
+    const updatedStartDate = startDate ?? trip.startDate;
+    const updatedEndDate = endDate ?? trip.endDate;
+    const updatedNotes = notes ?? trip.notes;
 
-    const updatedTrip = await trip.save();
-    res.status(200).json(updatedTrip);
+    if (Number(updatedBudget) < 0) {
+      return res.status(400).json({ message: 'Budget cannot be negative' });
+    }
+
+    if (new Date(updatedEndDate) < new Date(updatedStartDate)) {
+      return res.status(400).json({ message: 'End date cannot be before start date' });
+    }
+
+    trip.tripName = updatedTripName;
+    trip.budget = updatedBudget;
+    trip.startDate = updatedStartDate;
+    trip.endDate = updatedEndDate;
+    trip.notes = updatedNotes;
+
+    const savedTrip = await trip.save();
+    res.status(200).json(savedTrip);
   } catch (error) {
     console.error('updateTrip error:', error);
     res.status(500).json({ message: error.message });

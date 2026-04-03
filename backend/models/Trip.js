@@ -7,9 +7,29 @@ const tripSchema = new mongoose.Schema(
       required: true,
       ref: 'User',
     },
-    tripName: { type: String, required: true },
-    destination: { type: String, required: true },
-    travelDate: { type: Date, required: true },
+    tripName: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    budget: {
+      type: Number,
+      required: true,
+      min: 0,
+    },
+    startDate: {
+      type: Date,
+      required: true,
+    },
+    endDate: {
+      type: Date,
+      required: true,
+    },
+    notes: {
+      type: String,
+      default: '',
+      trim: true,
+    },
   },
   {
     timestamps: true,
