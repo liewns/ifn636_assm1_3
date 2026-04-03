@@ -11,27 +11,28 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="bg-blue-600 text-white p-4 flex justify-between items-center">
-      <Link to="/" className="text-2xl font-bold">Travel Expense Tracker</Link>
-      <div>
+    <nav className="bg-blue-600 text-white px-6 py-4 flex justify-between items-center">
+      <div className="text-xl font-bold">Travel Expense Tracker</div>
+
+      <div className="space-x-4">
         {user ? (
           <>
-            <Link to="/trips" className="mr-4">Trips</Link>
-            <Link to="/profile" className="mr-4">Profile</Link>
-            <button
-              onClick={handleLogout}
-              className="bg-red-500 px-4 py-2 rounded hover:bg-red-700"
-            >
+            <Link to="/trips" className="hover:underline">
+              Trips
+            </Link>
+            <Link to="/expenses" className="hover:underline">
+              Expenses
+            </Link>
+            <button onClick={handleLogout} className="bg-white text-blue-600 px-3 py-1 rounded">
               Logout
             </button>
           </>
         ) : (
           <>
-            <Link to="/login" className="mr-4">Login</Link>
-            <Link
-              to="/register"
-              className="bg-green-500 px-4 py-2 rounded hover:bg-green-700"
-            >
+            <Link to="/login" className="hover:underline">
+              Login
+            </Link>
+            <Link to="/register" className="hover:underline">
               Register
             </Link>
           </>

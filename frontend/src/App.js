@@ -1,10 +1,10 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Navbar from './components/Navbar';
-import Landing from './pages/Landing';
 import Login from './pages/Login';
 import Register from './pages/Register';
-import Profile from './pages/Profile';
 import Trips from './pages/Trip';
+import Expenses from './pages/Expenses';
+import Navbar from './components/Navbar';
+import Landing from './pages/Landing';
 
 function App() {
   return (
@@ -14,8 +14,8 @@ function App() {
         <Route path="/" element={<Landing />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/profile" element={<Profile />} />
         <Route path="/trips" element={<Trips />} />
+        <Route path="/expenses" element={<Expenses />} />
       </Routes>
     </Router>
   );
