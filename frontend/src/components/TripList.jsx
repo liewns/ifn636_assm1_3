@@ -12,6 +12,7 @@ const TripList = ({ trips, setTrips, setEditingTrip }) => {
 
       setTrips(trips.filter((trip) => trip._id !== tripId));
     } catch (error) {
+      console.error('Delete trip error:', error);
       alert(error.response?.data?.message || 'Failed to delete trip.');
     }
   };

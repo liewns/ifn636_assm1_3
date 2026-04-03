@@ -7,9 +7,9 @@ const tripSchema = new mongoose.Schema(
       required: true,
       ref: 'User',
     },
-    title: { type: String, required: true },
-    description: { type: String, required: true },
-    deadline: { type: Date, required: true },
+    tripName: { type: String, required: true },
+    destination: { type: String, required: true },
+    travelDate: { type: Date, required: true },
   },
   {
     timestamps: true,

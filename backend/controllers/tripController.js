@@ -3,7 +3,7 @@ const Trip = require('../models/Trip');
 const getTrips = async (req, res) => {
   try {
     const trips = await Trip.find({ user: req.user.id }).sort({ createdAt: -1 });
-    res.json(trips);
+    res.status(200).json(trips);
   } catch (error) {
     console.error('getTrips error:', error);
     res.status(500).json({ message: error.message });
@@ -43,7 +43,7 @@ const updateTrip = async (req, res) => {
     }
 
     if (trip.user.toString() !== req.user.id) {
-      return res.status(401).json({ message: 'Not authorized' });
+      return res.status(401).json({ message: 'Not authorised' });
     }
 
     trip.tripName = tripName || trip.tripName;
@@ -51,7 +51,7 @@ const updateTrip = async (req, res) => {
     trip.travelDate = travelDate || trip.travelDate;
 
     const updatedTrip = await trip.save();
-    res.json(updatedTrip);
+    res.status(200).json(updatedTrip);
   } catch (error) {
     console.error('updateTrip error:', error);
     res.status(500).json({ message: error.message });
@@ -67,11 +67,11 @@ const deleteTrip = async (req, res) => {
     }
 
     if (trip.user.toString() !== req.user.id) {
-      return res.status(401).json({ message: 'Not authorized' });
+      return res.status(401).json({ message: 'Not authorised' });
     }
 
     await trip.deleteOne();
-    res.json({ message: 'Trip deleted successfully' });
+    res.status(200).json({ message: 'Trip deleted successfully' });
   } catch (error) {
     console.error('deleteTrip error:', error);
     res.status(500).json({ message: error.message });

@@ -13,8 +13,8 @@ const TripForm = ({ trips, setTrips, editingTrip, setEditingTrip }) => {
   useEffect(() => {
     if (editingTrip) {
       setFormData({
-        tripName: editingTrip.tripName,
-        destination: editingTrip.destination,
+        tripName: editingTrip.tripName || '',
+        destination: editingTrip.destination || '',
         travelDate: editingTrip.travelDate
           ? editingTrip.travelDate.slice(0, 10)
           : '',
@@ -28,8 +28,20 @@ const TripForm = ({ trips, setTrips, editingTrip, setEditingTrip }) => {
     }
   }, [editingTrip]);
 
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!formData.tripName || !formData.destination || !formData.travelDate) {
+      alert('Please fill in all fields.');
+      return;
+    }
 
     try {
       if (editingTrip) {
@@ -61,6 +73,7 @@ const TripForm = ({ trips, setTrips, editingTrip, setEditingTrip }) => {
         travelDate: '',
       });
     } catch (error) {
+      console.error('Save trip error:', error);
       alert(error.response?.data?.message || 'Failed to save trip.');
     }
   };
@@ -73,32 +86,29 @@ const TripForm = ({ trips, setTrips, editingTrip, setEditingTrip }) => {
 
       <input
         type="text"
+        name="tripName"
         placeholder="Trip Name"
         value={formData.tripName}
-        onChange={(e) =>
-          setFormData({ ...formData, tripName: e.target.value })
-        }
+        onChange={handleChange}
         className="w-full mb-4 p-2 border rounded"
         required
       />
 
       <input
         type="text"
+        name="destination"
         placeholder="Destination"
         value={formData.destination}
-        onChange={(e) =>
-          setFormData({ ...formData, destination: e.target.value })
-        }
+        onChange={handleChange}
         className="w-full mb-4 p-2 border rounded"
         required
       />
 
       <input
         type="date"
+        name="travelDate"
         value={formData.travelDate}
-        onChange={(e) =>
-          setFormData({ ...formData, travelDate: e.target.value })
-        }
+        onChange={handleChange}
         className="w-full mb-4 p-2 border rounded"
         required
       />
