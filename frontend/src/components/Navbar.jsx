@@ -26,7 +26,13 @@ const Navbar = () => {
             <Link to="/expenses" className="hover:underline">
               Expenses
             </Link>
-            <button onClick={handleLogout} className="bg-white text-blue-600 px-3 py-1 rounded">
+            <Link to="/settings" className="hover:underline">
+              Settings
+            </Link>
+            <button
+              onClick={handleLogout}
+              className="bg-white text-blue-600 px-3 py-1 rounded"
+            >
               Logout
             </button>
           </>

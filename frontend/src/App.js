@@ -6,6 +6,7 @@ import Expenses from './pages/Expenses';
 import Navbar from './components/Navbar';
 import Landing from './pages/Landing';
 import Dashboard from './pages/Dashboard';
+import Settings from './pages/Settings';
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/trips" element={<Trips />} />
         <Route path="/expenses" element={<Expenses />} />
+        <Route path="/settings" element={<Settings />} />
       </Routes>
     </Router>
   );

@@ -8,11 +8,13 @@ import { useAuth } from '../context/AuthContext';
 const Trips = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+
   const [trips, setTrips] = useState([]);
+  const [expenses, setExpenses] = useState([]);
   const [editingTrip, setEditingTrip] = useState(null);
 
   useEffect(() => {
-    const fetchTrips = async () => {
+    const fetchData = async () => {
       if (!user || !user.token) {
         alert('Please log in first.');
         navigate('/login');
@@ -20,20 +22,26 @@ const Trips = () => {
       }
 
       try {
-        const response = await axiosInstance.get('/api/trips', {
-          headers: { Authorization: `Bearer ${user.token}` },
-        });
+        const [tripsResponse, expensesResponse] = await Promise.all([
+          axiosInstance.get('/api/trips', {
+            headers: { Authorization: `Bearer ${user.token}` },
+          }),
+          axiosInstance.get('/api/expenses', {
+            headers: { Authorization: `Bearer ${user.token}` },
+          }),
+        ]);
 
-        setTrips(response.data);
+        setTrips(tripsResponse.data);
+        setExpenses(expensesResponse.data);
       } catch (error) {
-        console.error('Fetch trips error:', error);
+        console.error('Fetch trip data error:', error);
         console.error('Status:', error.response?.status);
         console.error('Response data:', error.response?.data);
-        alert(error.response?.data?.message || 'Failed to fetch trips.');
+        alert(error.response?.data?.message || 'Failed to fetch trip data.');
       }
     };
 
-    fetchTrips();
+    fetchData();
   }, [user, navigate]);
 
   return (
@@ -44,8 +52,10 @@ const Trips = () => {
         editingTrip={editingTrip}
         setEditingTrip={setEditingTrip}
       />
+
       <TripList
         trips={trips}
+        expenses={expenses}
         setTrips={setTrips}
         setEditingTrip={setEditingTrip}
       />
