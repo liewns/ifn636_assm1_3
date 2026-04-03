@@ -3,23 +3,7 @@ import { Link } from 'react-router-dom';
 const Landing = () => {
   return (
     <div className="min-h-screen bg-slate-50">
-      {/* Public navbar for unauthenticated users */}
-      <nav className="bg-blue-600 text-white px-6 py-4 flex justify-between items-center">
-        <div className="text-xl font-bold">Travel Expense Tracker</div>
-
-        <div className="space-x-4">
-          <Link to="/login" className="hover:underline">
-            Login
-          </Link>
-          <Link to="/register" className="hover:underline">
-            Register
-          </Link>
-        </div>
-      </nav>
-
-      {/* Main landing page content for first-time and unauthenticated users */}
       <main className="px-8 py-16">
-        {/* Hero section introducing the system and primary actions */}
         <section className="max-w-6xl mx-auto grid md:grid-cols-2 gap-10 items-center">
           <div>
             <h2 className="text-5xl font-bold text-slate-900 leading-tight mb-6">
@@ -30,7 +14,6 @@ const Landing = () => {
               costs organised in one convenient system.
             </p>
 
-            {/* Call-to-action buttons for registration and login */}
             <div className="flex flex-wrap gap-4">
               <Link
                 to="/register"
@@ -47,7 +30,6 @@ const Landing = () => {
             </div>
           </div>
 
-          {/* Preview summary card showing example travel budget information */}
           <div className="bg-white shadow-lg rounded-2xl p-8">
             <h3 className="text-2xl font-bold mb-6 text-slate-800">Trip Overview</h3>
 
@@ -72,7 +54,6 @@ const Landing = () => {
           </div>
         </section>
 
-        {/* Features section highlighting the main functions of the application */}
         <section className="max-w-6xl mx-auto mt-20">
           <h3 className="text-3xl font-bold text-center mb-10 text-slate-900">
             Why use Travel Expense Tracker?
