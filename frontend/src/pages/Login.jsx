@@ -12,11 +12,17 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axiosInstance.post('/api/auth/login', formData);
+     const payload = {
+       email: formData.email.trim().toLowerCase(),
+        password: formData.password,
+      };
+
+      const response = await axiosInstance.post('/api/auth/login', payload);
       login(response.data);
-      navigate('/tasks');
+      navigate('/trips');
     } catch (error) {
-      alert('Login failed. Please try again.');
+      console.error('Login error:', error.response?.data || error.message);
+      alert(error.response?.data?.message || 'Login failed. Please try again.');
     }
   };
 
