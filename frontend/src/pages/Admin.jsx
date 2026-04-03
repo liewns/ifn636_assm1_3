@@ -12,47 +12,107 @@ const Admin = () => {
   const [trips, setTrips] = useState([]);
   const [expenses, setExpenses] = useState([]);
 
+  const fetchAdminData = async () => {
+    if (!user || !user.token) {
+      navigate('/login');
+      return;
+    }
+
+    if (user.role !== 'admin') {
+      alert('Admin access only.');
+      navigate('/dashboard');
+      return;
+    }
+
+    try {
+      const [summaryRes, usersRes, tripsRes, expensesRes] = await Promise.all([
+        axiosInstance.get('/api/admin/summary', {
+          headers: { Authorization: `Bearer ${user.token}` },
+        }),
+        axiosInstance.get('/api/admin/users', {
+          headers: { Authorization: `Bearer ${user.token}` },
+        }),
+        axiosInstance.get('/api/admin/trips', {
+          headers: { Authorization: `Bearer ${user.token}` },
+        }),
+        axiosInstance.get('/api/admin/expenses', {
+          headers: { Authorization: `Bearer ${user.token}` },
+        }),
+      ]);
+
+      setSummary(summaryRes.data);
+      setUsers(usersRes.data);
+      setTrips(tripsRes.data);
+      setExpenses(expensesRes.data);
+    } catch (error) {
+      console.error('Admin fetch error:', error);
+      alert(error.response?.data?.message || 'Failed to load admin panel.');
+    }
+  };
+
   useEffect(() => {
-    const fetchAdminData = async () => {
-      if (!user || !user.token) {
-        navigate('/login');
-        return;
-      }
-
-      if (user.role !== 'admin') {
-        alert('Admin access only.');
-        navigate('/dashboard');
-        return;
-      }
-
-      try {
-        const [summaryRes, usersRes, tripsRes, expensesRes] = await Promise.all([
-          axiosInstance.get('/api/admin/summary', {
-            headers: { Authorization: `Bearer ${user.token}` },
-          }),
-          axiosInstance.get('/api/admin/users', {
-            headers: { Authorization: `Bearer ${user.token}` },
-          }),
-          axiosInstance.get('/api/admin/trips', {
-            headers: { Authorization: `Bearer ${user.token}` },
-          }),
-          axiosInstance.get('/api/admin/expenses', {
-            headers: { Authorization: `Bearer ${user.token}` },
-          }),
-        ]);
-
-        setSummary(summaryRes.data);
-        setUsers(usersRes.data);
-        setTrips(tripsRes.data);
-        setExpenses(expensesRes.data);
-      } catch (error) {
-        console.error('Admin fetch error:', error);
-        alert(error.response?.data?.message || 'Failed to load admin panel.');
-      }
-    };
-
     fetchAdminData();
-  }, [user, navigate]);
+  }, [user]);
+
+  const handleDeleteUser = async (userItem) => {
+    const confirmed = window.confirm(
+      `Are you sure you want to delete user "${userItem.name}"?\n\nThis will also delete all of their trips and expenses.`
+    );
+
+    if (!confirmed) return;
+
+    try {
+      await axiosInstance.delete(`/api/admin/users/${userItem._id || userItem.id}`, {
+        headers: { Authorization: `Bearer ${user.token}` },
+      });
+
+      alert('User deleted successfully.');
+      fetchAdminData();
+    } catch (error) {
+      console.error('Delete user error:', error);
+      alert(error.response?.data?.message || 'Failed to delete user.');
+    }
+  };
+
+  const handleDeleteTrip = async (tripItem) => {
+    const confirmed = window.confirm(
+      `Are you sure you want to delete trip "${tripItem.tripName}"?\n\nThis will also delete all expenses linked to this trip.`
+    );
+
+    if (!confirmed) return;
+
+    try {
+      await axiosInstance.delete(`/api/admin/trips/${tripItem._id}`, {
+        headers: { Authorization: `Bearer ${user.token}` },
+      });
+
+      alert('Trip deleted successfully.');
+      fetchAdminData();
+    } catch (error) {
+      console.error('Delete trip error:', error);
+      alert(error.response?.data?.message || 'Failed to delete trip.');
+    }
+  };
+
+  const handleDeleteExpense = async (expenseItem) => {
+    const confirmed = window.confirm(
+      `Are you sure you want to delete expense "${expenseItem.title}"?`
+    );
+
+    if (!confirmed) return;
+
+    try {
+      await axiosInstance.delete(`/api/admin/expenses/${expenseItem._id}`, {
+        headers: { Authorization: `Bearer ${user.token}` },
+      });
+
+      alert('Expense deleted successfully.');
+      fetchAdminData();
+    } catch (error) {
+      console.error('Delete expense error:', error);
+      alert(error.response?.data?.message || 'Failed to delete expense.');
+    }
+  };
 
   if (!summary) {
     return (
@@ -101,6 +161,7 @@ const Admin = () => {
                   <th className="py-2">Name</th>
                   <th className="py-2">Email</th>
                   <th className="py-2">Role</th>
+                  <th className="py-2">Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -109,6 +170,15 @@ const Admin = () => {
                     <td className="py-2">{item.name}</td>
                     <td className="py-2">{item.email}</td>
                     <td className="py-2 capitalize">{item.role}</td>
+                    <td className="py-2">
+                      <button
+                        onClick={() => handleDeleteUser(item)}
+                        className="bg-red-500 text-white px-3 py-1 rounded"
+                        disabled={(item._id || item.id) === user.id}
+                      >
+                        Delete
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -125,6 +195,7 @@ const Admin = () => {
                   <th className="py-2">Trip Name</th>
                   <th className="py-2">Owner</th>
                   <th className="py-2">Budget</th>
+                  <th className="py-2">Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -133,6 +204,14 @@ const Admin = () => {
                     <td className="py-2">{item.tripName}</td>
                     <td className="py-2">{item.user?.name || 'Unknown user'}</td>
                     <td className="py-2">${Number(item.budget || 0).toFixed(2)}</td>
+                    <td className="py-2">
+                      <button
+                        onClick={() => handleDeleteTrip(item)}
+                        className="bg-red-500 text-white px-3 py-1 rounded"
+                      >
+                        Delete
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -150,6 +229,7 @@ const Admin = () => {
                   <th className="py-2">Trip</th>
                   <th className="py-2">User</th>
                   <th className="py-2">Amount</th>
+                  <th className="py-2">Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -159,6 +239,14 @@ const Admin = () => {
                     <td className="py-2">{item.trip?.tripName || 'No trip'}</td>
                     <td className="py-2">{item.user?.name || 'Unknown user'}</td>
                     <td className="py-2">${Number(item.amount || 0).toFixed(2)}</td>
+                    <td className="py-2">
+                      <button
+                        onClick={() => handleDeleteExpense(item)}
+                        className="bg-red-500 text-white px-3 py-1 rounded"
+                      >
+                        Delete
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>

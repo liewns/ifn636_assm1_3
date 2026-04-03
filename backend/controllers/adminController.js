@@ -63,9 +63,69 @@ const getAllExpenses = async (req, res) => {
   }
 };
 
+const deleteUser = async (req, res) => {
+  try {
+    const userToDelete = await User.findById(req.params.id);
+
+    if (!userToDelete) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    if (userToDelete._id.toString() === req.user.id) {
+      return res.status(400).json({ message: 'You cannot delete your own admin account' });
+    }
+
+    await Trip.deleteMany({ user: userToDelete._id });
+    await Expense.deleteMany({ user: userToDelete._id });
+    await userToDelete.deleteOne();
+
+    res.status(200).json({ message: 'User and related records deleted successfully' });
+  } catch (error) {
+    console.error('deleteUser error:', error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+const deleteTrip = async (req, res) => {
+  try {
+    const trip = await Trip.findById(req.params.id);
+
+    if (!trip) {
+      return res.status(404).json({ message: 'Trip not found' });
+    }
+
+    await Expense.deleteMany({ trip: trip._id });
+    await trip.deleteOne();
+
+    res.status(200).json({ message: 'Trip and related expenses deleted successfully' });
+  } catch (error) {
+    console.error('deleteTrip error:', error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+const deleteExpense = async (req, res) => {
+  try {
+    const expense = await Expense.findById(req.params.id);
+
+    if (!expense) {
+      return res.status(404).json({ message: 'Expense not found' });
+    }
+
+    await expense.deleteOne();
+    res.status(200).json({ message: 'Expense deleted successfully' });
+  } catch (error) {
+    console.error('deleteExpense error:', error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports = {
   getAdminSummary,
   getAllUsers,
   getAllTrips,
   getAllExpenses,
+  deleteUser,
+  deleteTrip,
+  deleteExpense,
 };
