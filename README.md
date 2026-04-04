@@ -194,7 +194,7 @@ No pre-created credentials are required. A new user account can be registered di
 
 If admin access is also required, use:
 
-**Admin Email:** `liewnasya@outlook.com`  
+**Admin Email:** `liewnasya123@gmail.com`  
 **Admin Password:** `liewnasya`
 
 ---

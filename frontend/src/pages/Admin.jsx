@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../axiosConfig';
 import { useAuth } from '../context/AuthContext';
@@ -12,7 +12,7 @@ const Admin = () => {
   const [trips, setTrips] = useState([]);
   const [expenses, setExpenses] = useState([]);
 
-  const fetchAdminData = useCallback(async () => {
+  const fetchAdminData = async () => {
     if (!user || !user.token) {
       navigate('/login');
       return;
@@ -48,11 +48,11 @@ const Admin = () => {
       console.error('Admin fetch error:', error);
       alert(error.response?.data?.message || 'Failed to load admin panel.');
     }
-  }, [user, navigate]);
+  };
 
   useEffect(() => {
     fetchAdminData();
-  }, [fetchAdminData]);
+  }, [user]);
 
   const handleDeleteUser = async (userItem) => {
     const confirmed = window.confirm(
