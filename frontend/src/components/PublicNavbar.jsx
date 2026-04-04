@@ -3,9 +3,11 @@ import { Link } from 'react-router-dom';
 const PublicNavbar = () => {
   return (
     <nav className="bg-blue-600 text-white px-6 py-4 flex justify-between items-center">
+      {/* Application title shown on the public navigation bar */}
       <div className="text-xl font-bold">Travel Expense Tracker</div>
 
       <div className="space-x-4">
+        {/* Navigation links for users who are not logged in */}
         <Link to="/login" className="hover:underline">
           Login
         </Link>

@@ -5,6 +5,7 @@ import axiosInstance from '../axiosConfig';
 const TripForm = ({ trips, setTrips, editingTrip, setEditingTrip }) => {
   const { user } = useAuth();
 
+  // Store form input values for creating or editing a trip
   const [formData, setFormData] = useState({
     tripName: '',
     budget: '',
@@ -13,6 +14,8 @@ const TripForm = ({ trips, setTrips, editingTrip, setEditingTrip }) => {
     notes: '',
   });
 
+  // Populate form fields when editing an existing trip
+  // Otherwise, reset the form for creating a new trip
   useEffect(() => {
     if (editingTrip) {
       setFormData({
@@ -33,6 +36,7 @@ const TripForm = ({ trips, setTrips, editingTrip, setEditingTrip }) => {
     }
   }, [editingTrip]);
 
+  // Update form state whenever an input value changes
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -40,6 +44,7 @@ const TripForm = ({ trips, setTrips, editingTrip, setEditingTrip }) => {
     });
   };
 
+  // Cancel edit mode and reset the form back to default values
   const handleCancelEdit = () => {
     setEditingTrip(null);
     setFormData({
@@ -51,31 +56,37 @@ const TripForm = ({ trips, setTrips, editingTrip, setEditingTrip }) => {
     });
   };
 
+  // Submit the form to create a new trip or update an existing one
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Check that all required fields are completed
     if (!formData.tripName || !formData.budget || !formData.startDate || !formData.endDate) {
       alert('Please fill in all required fields.');
       return;
     }
 
+    // Prevent negative budget values
     if (Number(formData.budget) < 0) {
       alert('Budget cannot be negative.');
       return;
     }
 
+    // Ensure the end date is not earlier than the start date
     if (new Date(formData.endDate) < new Date(formData.startDate)) {
       alert('End date cannot be before start date.');
       return;
     }
 
     try {
+      // Convert budget to a number before sending to the backend
       const payload = {
         ...formData,
         budget: Number(formData.budget),
       };
 
       if (editingTrip) {
+        // Update an existing trip
         const response = await axiosInstance.put(
           `/api/trips/${editingTrip._id}`,
           payload,
@@ -84,6 +95,7 @@ const TripForm = ({ trips, setTrips, editingTrip, setEditingTrip }) => {
           }
         );
 
+        // Replace the updated trip in the local state
         setTrips(
           trips.map((trip) =>
             trip._id === response.data._id ? response.data : trip
@@ -92,14 +104,17 @@ const TripForm = ({ trips, setTrips, editingTrip, setEditingTrip }) => {
 
         alert('Trip updated successfully.');
       } else {
+        // Create a new trip
         const response = await axiosInstance.post('/api/trips', payload, {
           headers: { Authorization: `Bearer ${user.token}` },
         });
 
+        // Add the new trip to the top of the list
         setTrips([response.data, ...trips]);
         alert('Trip created successfully.');
       }
 
+      // Reset the form after successful save
       setEditingTrip(null);
       setFormData({
         tripName: '',

@@ -11,6 +11,7 @@ const ExpenseForm = ({
 }) => {
   const { user } = useAuth();
 
+  // Store form input values for creating or editing an expense
   const [formData, setFormData] = useState({
     title: '',
     amount: '',
@@ -20,6 +21,8 @@ const ExpenseForm = ({
     notes: '',
   });
 
+  // Populate form fields when editing an expense
+  // Otherwise, reset the form and default to the first available trip
   useEffect(() => {
     if (editingExpense) {
       setFormData({
@@ -42,6 +45,7 @@ const ExpenseForm = ({
     }
   }, [editingExpense, trips]);
 
+  // Update form state whenever an input field changes
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -49,6 +53,7 @@ const ExpenseForm = ({
     });
   };
 
+  // Cancel edit mode and reset the form back to default values
   const handleCancelEdit = () => {
     setEditingExpense(null);
     setFormData({
@@ -61,26 +66,31 @@ const ExpenseForm = ({
     });
   };
 
+  // Submit the form to create a new expense or update an existing one
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Check that all required fields are completed
     if (!formData.title || !formData.amount || !formData.category || !formData.date || !formData.trip) {
       alert('Please fill in all required fields.');
       return;
     }
 
+    // Prevent negative expense values
     if (Number(formData.amount) < 0) {
       alert('Amount cannot be negative.');
       return;
     }
 
     try {
+      // Convert amount to a number before sending to the backend
       const payload = {
         ...formData,
         amount: Number(formData.amount),
       };
 
       if (editingExpense) {
+        // Update an existing expense
         const response = await axiosInstance.put(
           `/api/expenses/${editingExpense._id}`,
           payload,
@@ -89,6 +99,7 @@ const ExpenseForm = ({
           }
         );
 
+        // Replace the updated expense in the local state
         setExpenses(
           expenses.map((expense) =>
             expense._id === response.data._id ? response.data : expense
@@ -97,14 +108,17 @@ const ExpenseForm = ({
 
         alert('Expense updated successfully.');
       } else {
+        // Create a new expense
         const response = await axiosInstance.post('/api/expenses', payload, {
           headers: { Authorization: `Bearer ${user.token}` },
         });
 
+        // Add the new expense to the top of the list
         setExpenses([response.data, ...expenses]);
         alert('Expense created successfully.');
       }
 
+      // Reset form after successful save
       setEditingExpense(null);
       setFormData({
         title: '',

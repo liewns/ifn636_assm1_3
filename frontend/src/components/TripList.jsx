@@ -5,7 +5,9 @@ import axiosInstance from '../axiosConfig';
 const TripList = ({ trips, expenses, setTrips, setEditingTrip }) => {
   const { user } = useAuth();
 
+  // Delete a trip after user confirmation
   const handleDelete = async (trip) => {
+    // Ask the user to confirm before deleting
     const confirmed = window.confirm(
       `Are you sure you want to delete "${trip.tripName}"?\n\nThis action cannot be undone.`
     );
@@ -13,10 +15,12 @@ const TripList = ({ trips, expenses, setTrips, setEditingTrip }) => {
     if (!confirmed) return;
 
     try {
+      // Send delete request for the selected trip
       await axiosInstance.delete(`/api/trips/${trip._id}`, {
         headers: { Authorization: `Bearer ${user.token}` },
       });
 
+      // Remove the deleted trip from the local state
       setTrips(trips.filter((item) => item._id !== trip._id));
       alert('Trip deleted successfully.');
     } catch (error) {
@@ -25,6 +29,7 @@ const TripList = ({ trips, expenses, setTrips, setEditingTrip }) => {
     }
   };
 
+  // Get all expenses linked to a specific trip
   const getTripExpenses = (tripId) => {
     return expenses.filter((expense) => {
       const expenseTripId =
@@ -34,6 +39,7 @@ const TripList = ({ trips, expenses, setTrips, setEditingTrip }) => {
     });
   };
 
+  // Calculate the total amount spent for a specific trip
   const getTotalSpent = (tripId) => {
     return getTripExpenses(tripId).reduce(
       (total, expense) => total + Number(expense.amount || 0),
@@ -46,6 +52,7 @@ const TripList = ({ trips, expenses, setTrips, setEditingTrip }) => {
       <h2 className="text-2xl font-bold mb-4">My Trips</h2>
 
       {trips.length === 0 ? (
+        // Show empty state message when no trips are available
         <div className="bg-white border border-slate-200 rounded-2xl shadow p-6 text-center">
           <h3 className="text-xl font-semibold text-slate-900 mb-2">
             No trips yet
@@ -58,6 +65,7 @@ const TripList = ({ trips, expenses, setTrips, setEditingTrip }) => {
           </p>
         </div>
       ) : (
+        // Display each trip in a card layout
         trips.map((trip) => {
           const totalSpent = getTotalSpent(trip._id);
           const remaining = Number(trip.budget || 0) - totalSpent;
@@ -119,6 +127,7 @@ const TripList = ({ trips, expenses, setTrips, setEditingTrip }) => {
                 </div>
 
                 <div>
+                  {/* Show budget status badge */}
                   {isOverBudget ? (
                     <span className="bg-red-100 text-red-700 px-3 py-1 rounded-full text-sm font-medium">
                       Over Budget
@@ -133,6 +142,7 @@ const TripList = ({ trips, expenses, setTrips, setEditingTrip }) => {
 
               <div className="mt-4 flex flex-wrap gap-2">
                 <button
+                  // Load selected trip into the form for editing
                   onClick={() => setEditingTrip(trip)}
                   className="bg-yellow-500 text-white px-4 py-2 rounded"
                 >
@@ -140,6 +150,7 @@ const TripList = ({ trips, expenses, setTrips, setEditingTrip }) => {
                 </button>
 
                 <button
+                  // Delete the selected trip
                   onClick={() => handleDelete(trip)}
                   className="bg-red-500 text-white px-4 py-2 rounded"
                 >
@@ -147,6 +158,7 @@ const TripList = ({ trips, expenses, setTrips, setEditingTrip }) => {
                 </button>
 
                 <Link
+                  // Navigate to the detailed trip page
                   to={`/trips/${trip._id}`}
                   className="bg-blue-600 text-white px-4 py-2 rounded"
                 >
