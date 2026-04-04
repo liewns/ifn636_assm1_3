@@ -9,12 +9,15 @@ const Trips = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
+  // Store trip data, expense data, and the selected trip for editing
   const [trips, setTrips] = useState([]);
   const [expenses, setExpenses] = useState([]);
   const [editingTrip, setEditingTrip] = useState(null);
 
   useEffect(() => {
+    // Fetch trips and expenses when the page loads
     const fetchData = async () => {
+      // Redirect unauthenticated users to the login page
       if (!user || !user.token) {
         alert('Please log in first.');
         navigate('/login');
@@ -22,6 +25,7 @@ const Trips = () => {
       }
 
       try {
+        // Request trips and expenses at the same time
         const [tripsResponse, expensesResponse] = await Promise.all([
           axiosInstance.get('/api/trips', {
             headers: { Authorization: `Bearer ${user.token}` },
@@ -31,6 +35,7 @@ const Trips = () => {
           }),
         ]);
 
+        // Save fetched data into local state
         setTrips(tripsResponse.data);
         setExpenses(expensesResponse.data);
       } catch (error) {
@@ -46,6 +51,7 @@ const Trips = () => {
 
   return (
     <div className="container mx-auto p-6">
+      {/* Form for creating a new trip or editing an existing one */}
       <TripForm
         trips={trips}
         setTrips={setTrips}
@@ -53,6 +59,7 @@ const Trips = () => {
         setEditingTrip={setEditingTrip}
       />
 
+      {/* List of trips with related expense information */}
       <TripList
         trips={trips}
         expenses={expenses}

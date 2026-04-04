@@ -7,17 +7,20 @@ const Settings = () => {
   const { user, logout, updateUser } = useAuth();
   const navigate = useNavigate();
 
+  // Store editable profile details
   const [profileForm, setProfileForm] = useState({
     name: '',
     email: '',
   });
 
+  // Store password update fields
   const [passwordForm, setPasswordForm] = useState({
     currentPassword: '',
     newPassword: '',
     confirmPassword: '',
   });
 
+  // Store local user preferences such as currency, notifications, and theme
   const [settings, setSettings] = useState({
     currency: 'AUD',
     notifications: true,
@@ -25,17 +28,20 @@ const Settings = () => {
   });
 
   useEffect(() => {
+    // Redirect unauthenticated users to the login page
     if (!user || !user.token) {
       navigate('/login');
       return;
     }
 
+    // Fetch the user's current profile details from the backend
     const fetchProfile = async () => {
       try {
         const response = await axiosInstance.get('/api/auth/profile', {
           headers: { Authorization: `Bearer ${user.token}` },
         });
 
+        // Populate the profile form with saved user data
         setProfileForm({
           name: response.data.name || '',
           email: response.data.email || '',
@@ -48,12 +54,14 @@ const Settings = () => {
 
     fetchProfile();
 
+    // Load saved preferences from localStorage if they exist
     const savedSettings = localStorage.getItem('travelExpenseSettings');
     if (savedSettings) {
       setSettings(JSON.parse(savedSettings));
     }
   }, [user, navigate]);
 
+  // Submit updated profile details to the backend
   const handleProfileUpdate = async (e) => {
     e.preventDefault();
 
@@ -62,6 +70,7 @@ const Settings = () => {
         headers: { Authorization: `Bearer ${user.token}` },
       });
 
+      // Update user details in context after a successful profile change
       updateUser(response.data);
       alert('Profile updated successfully.');
     } catch (error) {
@@ -70,6 +79,7 @@ const Settings = () => {
     }
   };
 
+  // Submit password change request to the backend
   const handlePasswordUpdate = async (e) => {
     e.preventDefault();
 
@@ -80,6 +90,7 @@ const Settings = () => {
 
       alert(response.data.message || 'Password updated successfully.');
 
+      // Clear password fields after a successful update
       setPasswordForm({
         currentPassword: '',
         newPassword: '',
@@ -91,11 +102,13 @@ const Settings = () => {
     }
   };
 
+  // Save user preferences locally in the browser
   const handleSavePreferences = () => {
     localStorage.setItem('travelExpenseSettings', JSON.stringify(settings));
     alert('Settings saved successfully.');
   };
 
+  // Log the user out and redirect them to the login page
   const handleLogout = () => {
     logout();
     navigate('/login');
@@ -104,11 +117,13 @@ const Settings = () => {
   return (
     <div className="min-h-screen bg-slate-50 p-6">
       <div className="max-w-3xl mx-auto">
+        {/* Page heading and short description */}
         <h1 className="text-3xl font-bold text-slate-900 mb-2">Settings</h1>
         <p className="text-slate-600 mb-8">
           Manage your profile, preferences, and account settings.
         </p>
 
+        {/* Profile update section */}
         <div className="bg-white rounded-2xl shadow p-6 mb-6">
           <h2 className="text-xl font-semibold text-slate-900 mb-4">Profile</h2>
 
@@ -148,6 +163,7 @@ const Settings = () => {
           </form>
         </div>
 
+        {/* Password update section */}
         <div className="bg-white rounded-2xl shadow p-6 mb-6">
           <h2 className="text-xl font-semibold text-slate-900 mb-4">Security</h2>
 
@@ -209,6 +225,7 @@ const Settings = () => {
           </form>
         </div>
 
+        {/* Preferences section for local app settings */}
         <div className="bg-white rounded-2xl shadow p-6 mb-6">
           <h2 className="text-xl font-semibold text-slate-900 mb-4">Preferences</h2>
 
@@ -274,6 +291,7 @@ const Settings = () => {
           </div>
         </div>
 
+        {/* Account section with logout action */}
         <div className="bg-white rounded-2xl shadow p-6">
           <h2 className="text-xl font-semibold text-slate-900 mb-4">Account</h2>
           <button

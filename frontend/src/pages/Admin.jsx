@@ -7,17 +7,21 @@ const Admin = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
+  // Store admin summary data and platform records
   const [summary, setSummary] = useState(null);
   const [users, setUsers] = useState([]);
   const [trips, setTrips] = useState([]);
   const [expenses, setExpenses] = useState([]);
 
+  // Fetch all admin dashboard data from the backend
   const fetchAdminData = useCallback(async () => {
+    // Redirect to login if there is no authenticated user
     if (!user || !user.token) {
       navigate('/login');
       return;
     }
 
+    // Restrict this page to admin users only
     if (user.role !== 'admin') {
       alert('Admin access only.');
       navigate('/dashboard');
@@ -25,6 +29,7 @@ const Admin = () => {
     }
 
     try {
+      // Request summary, users, trips, and expenses at the same time
       const [summaryRes, usersRes, tripsRes, expensesRes] = await Promise.all([
         axiosInstance.get('/api/admin/summary', {
           headers: { Authorization: `Bearer ${user.token}` },
@@ -40,6 +45,7 @@ const Admin = () => {
         }),
       ]);
 
+      // Save all returned admin data into local state
       setSummary(summaryRes.data);
       setUsers(usersRes.data);
       setTrips(tripsRes.data);
@@ -50,10 +56,12 @@ const Admin = () => {
     }
   }, [user, navigate]);
 
+  // Load admin data when the page first opens
   useEffect(() => {
     fetchAdminData();
   }, [fetchAdminData]);
 
+  // Delete a user after confirmation
   const handleDeleteUser = async (userItem) => {
     const confirmed = window.confirm(
       `Are you sure you want to delete user "${userItem.name}"?\n\nThis will also delete all of their trips and expenses.`
@@ -62,11 +70,14 @@ const Admin = () => {
     if (!confirmed) return;
 
     try {
+      // Send delete request for the selected user
       await axiosInstance.delete(`/api/admin/users/${userItem._id || userItem.id}`, {
         headers: { Authorization: `Bearer ${user.token}` },
       });
 
       alert('User deleted successfully.');
+
+      // Refresh admin data after deletion
       fetchAdminData();
     } catch (error) {
       console.error('Delete user error:', error);
@@ -74,6 +85,7 @@ const Admin = () => {
     }
   };
 
+  // Delete a trip after confirmation
   const handleDeleteTrip = async (tripItem) => {
     const confirmed = window.confirm(
       `Are you sure you want to delete trip "${tripItem.tripName}"?\n\nThis will also delete all expenses linked to this trip.`
@@ -82,11 +94,14 @@ const Admin = () => {
     if (!confirmed) return;
 
     try {
+      // Send delete request for the selected trip
       await axiosInstance.delete(`/api/admin/trips/${tripItem._id}`, {
         headers: { Authorization: `Bearer ${user.token}` },
       });
 
       alert('Trip deleted successfully.');
+
+      // Refresh admin data after deletion
       fetchAdminData();
     } catch (error) {
       console.error('Delete trip error:', error);
@@ -94,6 +109,7 @@ const Admin = () => {
     }
   };
 
+  // Delete an expense after confirmation
   const handleDeleteExpense = async (expenseItem) => {
     const confirmed = window.confirm(
       `Are you sure you want to delete expense "${expenseItem.title}"?`
@@ -102,11 +118,14 @@ const Admin = () => {
     if (!confirmed) return;
 
     try {
+      // Send delete request for the selected expense
       await axiosInstance.delete(`/api/admin/expenses/${expenseItem._id}`, {
         headers: { Authorization: `Bearer ${user.token}` },
       });
 
       alert('Expense deleted successfully.');
+
+      // Refresh admin data after deletion
       fetchAdminData();
     } catch (error) {
       console.error('Delete expense error:', error);
@@ -114,6 +133,7 @@ const Admin = () => {
     }
   };
 
+  // Show loading message while summary data is still being retrieved
   if (!summary) {
     return (
       <div className="min-h-screen bg-slate-50 p-6">
@@ -130,6 +150,7 @@ const Admin = () => {
           View platform-wide users, trips, expenses, and summary data.
         </p>
 
+        {/* Summary cards showing key platform totals */}
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
           <div className="bg-white rounded-2xl shadow p-6">
             <p className="text-slate-500 text-sm">Total Users</p>
@@ -152,6 +173,7 @@ const Admin = () => {
           </div>
         </div>
 
+        {/* Table showing all users in the system */}
         <div className="bg-white rounded-2xl shadow p-6 mb-6">
           <h2 className="text-2xl font-semibold mb-4">Users</h2>
           <div className="overflow-x-auto">
@@ -186,6 +208,7 @@ const Admin = () => {
           </div>
         </div>
 
+        {/* Table showing all trips in the system */}
         <div className="bg-white rounded-2xl shadow p-6 mb-6">
           <h2 className="text-2xl font-semibold mb-4">Trips</h2>
           <div className="overflow-x-auto">
@@ -219,6 +242,7 @@ const Admin = () => {
           </div>
         </div>
 
+        {/* Table showing all expenses in the system */}
         <div className="bg-white rounded-2xl shadow p-6">
           <h2 className="text-2xl font-semibold mb-4">Expenses</h2>
           <div className="overflow-x-auto">

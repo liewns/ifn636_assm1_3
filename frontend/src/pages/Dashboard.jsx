@@ -7,17 +7,21 @@ const Dashboard = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
+  // Store trip and expense data for the dashboard
   const [trips, setTrips] = useState([]);
   const [expenses, setExpenses] = useState([]);
 
+  // Fetch trips and expenses when the dashboard loads
   useEffect(() => {
     const fetchData = async () => {
+      // Redirect to login if no authenticated user exists
       if (!user || !user.token) {
         navigate('/login');
         return;
       }
 
       try {
+        // Request trips and expenses at the same time
         const [tripsResponse, expensesResponse] = await Promise.all([
           axiosInstance.get('/api/trips', {
             headers: { Authorization: `Bearer ${user.token}` },
@@ -27,6 +31,7 @@ const Dashboard = () => {
           }),
         ]);
 
+        // Save returned data into local state
         setTrips(tripsResponse.data);
         setExpenses(expensesResponse.data);
       } catch (error) {
@@ -38,6 +43,7 @@ const Dashboard = () => {
     fetchData();
   }, [user, navigate]);
 
+  // Calculate summary values for dashboard cards
   const summary = useMemo(() => {
     const totalTrips = trips.length;
     const totalBudget = trips.reduce((sum, trip) => sum + Number(trip.budget || 0), 0);
@@ -52,6 +58,7 @@ const Dashboard = () => {
     };
   }, [trips, expenses]);
 
+  // Get the next three upcoming trips sorted by start date
   const upcomingTrips = useMemo(() => {
     const today = new Date();
 
@@ -61,6 +68,7 @@ const Dashboard = () => {
       .slice(0, 3);
   }, [trips]);
 
+  // Get the five most recent expenses sorted by date
   const recentExpenses = useMemo(() => {
     return [...expenses]
       .sort((a, b) => new Date(b.date) - new Date(a.date))
@@ -77,6 +85,7 @@ const Dashboard = () => {
           </p>
         </div>
 
+        {/* Summary cards showing overall trip and spending information */}
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-10">
           <div className="bg-white rounded-2xl shadow p-6">
             <p className="text-slate-500 text-sm">Total Trips</p>
@@ -109,6 +118,7 @@ const Dashboard = () => {
           </div>
         </div>
 
+        {/* Section for upcoming trips and recent expenses */}
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-8">
           <div className="bg-white rounded-2xl shadow p-6">
             <div className="flex items-center justify-between mb-4">
@@ -179,6 +189,7 @@ const Dashboard = () => {
           </div>
         </div>
 
+        {/* Quick action buttons for navigating to main management pages */}
         <div className="flex gap-4">
           <Link
             to="/trips"

@@ -4,19 +4,25 @@ import { useAuth } from '../context/AuthContext';
 import axiosInstance from '../axiosConfig';
 
 const Login = () => {
+  // Store login form input values
   const [formData, setFormData] = useState({ email: '', password: '' });
   const { login } = useAuth();
   const navigate = useNavigate();
 
+  // Submit the login form and authenticate the user
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      // Clean the email before sending it to the backend
       const payload = {
         email: formData.email.trim().toLowerCase(),
         password: formData.password,
       };
 
+      // Send login request to the backend
       const response = await axiosInstance.post('/api/auth/login', payload);
+
+      // Save authenticated user data and redirect to dashboard
       login(response.data);
       navigate('/dashboard');
     } catch (error) {
@@ -28,6 +34,7 @@ const Login = () => {
   return (
     <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4">
       <div className="w-full max-w-md bg-white shadow-lg rounded-2xl p-8">
+        {/* Page heading and short description */}
         <div className="text-center mb-6">
           <h1 className="text-3xl font-bold text-slate-900 mb-2">Welcome back</h1>
           <p className="text-slate-600">
@@ -35,6 +42,7 @@ const Login = () => {
           </p>
         </div>
 
+        {/* Login form */}
         <form onSubmit={handleSubmit} className="space-y-4">
           <input
             type="email"
@@ -62,6 +70,7 @@ const Login = () => {
           </button>
         </form>
 
+        {/* Link to registration page for new users */}
         <p className="text-center text-slate-600 mt-6">
           Don&apos;t have an account?{' '}
           <Link to="/register" className="text-blue-600 font-semibold hover:underline">

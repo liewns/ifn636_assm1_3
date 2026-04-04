@@ -9,18 +9,22 @@ const Expenses = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
+  // Store expense data, available trips, and the selected expense for editing
   const [expenses, setExpenses] = useState([]);
   const [trips, setTrips] = useState([]);
   const [editingExpense, setEditingExpense] = useState(null);
 
+  // Store filter and sorting options for the expense list
   const [filters, setFilters] = useState({
     trip: '',
     category: '',
     sort: 'latest',
   });
 
+  // Fetch expenses and trips when the page loads
   useEffect(() => {
     const fetchData = async () => {
+      // Redirect unauthenticated users to the login page
       if (!user || !user.token) {
         alert('Please log in first.');
         navigate('/login');
@@ -28,6 +32,7 @@ const Expenses = () => {
       }
 
       try {
+        // Request expenses and trips at the same time
         const [expensesResponse, tripsResponse] = await Promise.all([
           axiosInstance.get('/api/expenses', {
             headers: { Authorization: `Bearer ${user.token}` },
@@ -37,6 +42,7 @@ const Expenses = () => {
           }),
         ]);
 
+        // Save fetched data into local state
         setExpenses(expensesResponse.data);
         setTrips(tripsResponse.data);
       } catch (error) {
@@ -48,9 +54,11 @@ const Expenses = () => {
     fetchData();
   }, [user, navigate]);
 
+  // Filter and sort expenses based on selected options
   const filteredExpenses = useMemo(() => {
     let result = [...expenses];
 
+    // Filter expenses by selected trip
     if (filters.trip) {
       result = result.filter((expense) => {
         const expenseTripId =
@@ -59,10 +67,12 @@ const Expenses = () => {
       });
     }
 
+    // Filter expenses by selected category
     if (filters.category) {
       result = result.filter((expense) => expense.category === filters.category);
     }
 
+    // Sort expenses according to the selected order
     if (filters.sort === 'latest') {
       result.sort((a, b) => new Date(b.date) - new Date(a.date));
     } else if (filters.sort === 'oldest') {
@@ -78,6 +88,7 @@ const Expenses = () => {
 
   return (
     <div className="container mx-auto p-6">
+      {/* Form for creating a new expense or editing an existing one */}
       <ExpenseForm
         expenses={expenses}
         setExpenses={setExpenses}
@@ -86,6 +97,7 @@ const Expenses = () => {
         setEditingExpense={setEditingExpense}
       />
 
+      {/* Filter and sort controls for the expense list */}
       <div className="bg-white rounded-2xl shadow p-6 mb-6">
         <h2 className="text-xl font-semibold mb-4">Filter and Sort Expenses</h2>
 
@@ -136,6 +148,7 @@ const Expenses = () => {
         </div>
       </div>
 
+      {/* Display the filtered and sorted list of expenses */}
       <ExpenseList
         expenses={filteredExpenses}
         setExpenses={setExpenses}

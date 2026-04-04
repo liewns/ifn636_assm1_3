@@ -8,18 +8,22 @@ const TripDetails = () => {
   const navigate = useNavigate();
   const { id } = useParams();
 
+  // Store the selected trip, its related expenses, and loading state
   const [trip, setTrip] = useState(null);
   const [expenses, setExpenses] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Fetch trip and expense data for the selected trip
     const fetchTripDetails = async () => {
+      // Redirect unauthenticated users to the login page
       if (!user || !user.token) {
         navigate('/login');
         return;
       }
 
       try {
+        // Request all trips and expenses at the same time
         const [tripsResponse, expensesResponse] = await Promise.all([
           axiosInstance.get('/api/trips', {
             headers: { Authorization: `Bearer ${user.token}` },
@@ -29,20 +33,24 @@ const TripDetails = () => {
           }),
         ]);
 
+        // Find the trip that matches the route ID
         const selectedTrip = tripsResponse.data.find((item) => item._id === id);
 
+        // Redirect back if the trip cannot be found
         if (!selectedTrip) {
           alert('Trip not found.');
           navigate('/trips');
           return;
         }
 
+        // Filter expenses that belong to the selected trip
         const tripExpenses = expensesResponse.data.filter((expense) => {
           const expenseTripId =
             typeof expense.trip === 'object' ? expense.trip?._id : expense.trip;
           return expenseTripId === id;
         });
 
+        // Save trip and related expenses into local state
         setTrip(selectedTrip);
         setExpenses(tripExpenses);
       } catch (error) {
@@ -56,13 +64,16 @@ const TripDetails = () => {
     fetchTripDetails();
   }, [user, navigate, id]);
 
+  // Calculate the total amount spent for this trip
   const totalSpent = useMemo(() => {
     return expenses.reduce((sum, expense) => sum + Number(expense.amount || 0), 0);
   }, [expenses]);
 
+  // Calculate remaining budget and check whether the trip is over budget
   const remaining = trip ? Number(trip.budget || 0) - totalSpent : 0;
   const isOverBudget = remaining < 0;
 
+  // Show loading message while trip details are being retrieved
   if (loading) {
     return (
       <div className="min-h-screen bg-slate-50 p-6">
@@ -71,6 +82,7 @@ const TripDetails = () => {
     );
   }
 
+  // Return nothing if no trip is available after loading
   if (!trip) {
     return null;
   }
@@ -78,12 +90,14 @@ const TripDetails = () => {
   return (
     <div className="min-h-screen bg-slate-50 p-6">
       <div className="max-w-5xl mx-auto">
+        {/* Link back to the main trips page */}
         <div className="mb-6">
           <Link to="/trips" className="text-blue-600 hover:underline">
             ← Back to Trips
           </Link>
         </div>
 
+        {/* Main trip information card */}
         <div className="bg-white rounded-2xl shadow p-6 mb-6">
           <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4">
             <div>
@@ -116,6 +130,7 @@ const TripDetails = () => {
             </div>
 
             <div>
+              {/* Show a badge to indicate whether the trip is over budget */}
               {isOverBudget ? (
                 <span className="bg-red-100 text-red-700 px-3 py-1 rounded-full text-sm font-medium">
                   Over Budget
@@ -129,6 +144,7 @@ const TripDetails = () => {
           </div>
         </div>
 
+        {/* Summary cards for expense count, total spent, and remaining budget */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
           <div className="bg-white rounded-2xl shadow p-6">
             <p className="text-slate-500 text-sm">Expenses Count</p>
@@ -156,6 +172,7 @@ const TripDetails = () => {
           </div>
         </div>
 
+        {/* Expense list section for this specific trip */}
         <div className="bg-white rounded-2xl shadow p-6">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-2xl font-semibold text-slate-900">
@@ -170,6 +187,7 @@ const TripDetails = () => {
           </div>
 
           {expenses.length === 0 ? (
+            // Show empty state message when no expenses are linked to the trip
             <div className="border border-slate-200 rounded-2xl p-6 text-center">
               <h3 className="text-xl font-semibold text-slate-900 mb-2">
                 No expenses linked to this trip yet
@@ -182,6 +200,7 @@ const TripDetails = () => {
               </p>
             </div>
           ) : (
+            // Display all expenses linked to this trip
             <div className="space-y-4">
               {expenses.map((expense) => (
                 <div

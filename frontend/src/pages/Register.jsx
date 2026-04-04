@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import axiosInstance from '../axiosConfig';
 
 const Register = () => {
+  // Store registration form input values
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -16,7 +17,10 @@ const Register = () => {
     e.preventDefault();
 
     try {
+      // Send registration request to the backend
       await axiosInstance.post('/api/auth/register', formData);
+
+      // Notify the user and redirect to the login page after success
       alert('Registration successful. Please log in.');
       navigate('/login');
     } catch (error) {
@@ -72,6 +76,7 @@ const Register = () => {
             required
           />
 
+          {/* Submit button for creating a new account */}
           <button
             type="submit"
             className="w-full bg-green-600 text-white p-3 rounded-lg font-semibold hover:bg-green-700 transition"
