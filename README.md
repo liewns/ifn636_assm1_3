@@ -184,7 +184,7 @@ Deployment components include:
 
 The deployed application can be accessed at:
 
-**http://3.25.95.6**
+**http://3.25.95.6:3000**
 
 ---
 
