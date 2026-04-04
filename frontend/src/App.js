@@ -14,13 +14,16 @@ import Admin from './pages/Admin';
 function AppRoutes() {
   const location = useLocation();
 
+  // Define routes that should use the public navigation bar
   const publicPages = ['/', '/login', '/register'];
   const isPublicPage = publicPages.includes(location.pathname);
 
   return (
     <>
+      {/* Show public navbar on landing, login, and register pages */}
       {isPublicPage ? <PublicNavbar /> : <Navbar />}
 
+      {/* Define all application routes */}
       <Routes>
         <Route path="/" element={<Landing />} />
         <Route path="/dashboard" element={<Dashboard />} />
@@ -38,6 +41,7 @@ function AppRoutes() {
 
 function App() {
   return (
+    // Wrap the app in the Router so routing works across all pages
     <Router>
       <AppRoutes />
     </Router>
